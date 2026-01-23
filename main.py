@@ -3,14 +3,14 @@ import mediapipe as mp
 import gradio as gr
 import numpy as np
 
-# --- 1. Setup MediaPipe ---
+
 mp_face_detection = mp.solutions.face_detection
 face_detection = mp_face_detection.FaceDetection(
     model_selection=0,
     min_detection_confidence=0.5
 )
 
-# --- 2. Processing Function ---
+
 def process_img(img):
     if img is None:
         return None
@@ -19,10 +19,7 @@ def process_img(img):
     img = img.copy()
 
     H, W, _ = img.shape
-    
-    # --- FIX IS HERE ---
-    # Gradio already gives RGB. MediaPipe wants RGB.
-    # We do NOT need to convert colors. We pass 'img' directly.
+  
     out = face_detection.process(img)
 
     if out.detections:
@@ -39,8 +36,7 @@ def process_img(img):
             x2 = min(W, x1 + w)
             y2 = min(H, y1 + h)
 
-            # Apply Blur
-            # Check if region is valid to prevent crashes
+           
             if x2 > x1 and y2 > y1:
                 img[y1:y2, x1:x2] = cv2.blur(
                     img[y1:y2, x1:x2], (50, 50) # Increased blur to 50 for better visibility
@@ -48,8 +44,6 @@ def process_img(img):
 
     return img
 
-# --- 3. Run App ---
-# I kept your structure but updated 'source' to 'sources' for compatibility
 app = gr.Interface(
     fn=process_img,
     inputs=gr.Image(sources=["webcam"], streaming=True, type="numpy"),
@@ -60,4 +54,5 @@ app = gr.Interface(
 )
 
 if __name__ == "__main__":
+
     app.launch(share=True)
